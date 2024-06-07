@@ -24,6 +24,8 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
     constructor(
         address _bridge,
         uint32 _baseChainAssetPrecision,
+        string memory _baseChainBridgeAddress, 
+        string memory _baseChainAssetDenomination,
         string memory _name,
         string memory _symbol
     ) ERC20(_name, _symbol) {
@@ -33,6 +35,8 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
         }
 
         BASE_CHAIN_ASSET_PRECISION = _baseChainAssetPrecision;
+        BASE_CHAIN_BRIDGE_ADDRESS = _baseChainBridgeAddress;
+        BASE_CHAIN_ASSET_DENOMINATION = _baseChainAssetDenomination;
         DIVISOR = 10 ** (decimals - _baseChainAssetPrecision);
         BRIDGE = _bridge;
     }
@@ -50,7 +54,7 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
         emit Mint(_to, _amount);
     }
 
-    function withdrawToSequencer(uint256 _amount, address _destinationChainAddress)
+    function withdrawToSequencer(uint256 _amount, string calldata _destinationChainAddress)
         external
         sufficientValue(_amount)
     {

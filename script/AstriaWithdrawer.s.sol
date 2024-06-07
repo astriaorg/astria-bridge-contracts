@@ -9,9 +9,11 @@ contract AstriaWithdrawerScript is Script {
 
     function deploy() public {
         uint32 baseChainAssetPrecision = uint32(vm.envUint("BASE_CHAIN_ASSET_PRECISION"));
+        string memory baseChainBridgeAddress = vm.envString("BASE_CHAIN_BRIDGE_ADDRESS");
+        string memory baseChainAssetDenomination = vm.envString("BASE_CHAIN_ASSET_DENOMINATION");
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
-        new AstriaWithdrawer(baseChainAssetPrecision);
+        new AstriaWithdrawer(baseChainAssetPrecision, baseChainBridgeAddress, baseChainAssetDenomination);
         vm.stopBroadcast();
     }
 
@@ -22,7 +24,7 @@ contract AstriaWithdrawerScript is Script {
         address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
         AstriaWithdrawer astriaWithdrawer = AstriaWithdrawer(contractAddress);
 
-        address destinationChainAddress = vm.envAddress("SEQUENCER_DESTINATION_CHAIN_ADDRESS");
+        string memory destinationChainAddress = vm.envString("SEQUENCER_DESTINATION_CHAIN_ADDRESS");
         uint256 amount = vm.envUint("AMOUNT");
         astriaWithdrawer.withdrawToSequencer{value: amount}(destinationChainAddress);
 

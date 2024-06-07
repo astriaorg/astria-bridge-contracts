@@ -12,11 +12,13 @@ contract AstriaWithdrawer is IAstriaWithdrawer {
     // set to 10 ** (18 - BASE_CHAIN_ASSET_PRECISION) on contract creation
     uint256 private immutable DIVISOR;
 
-    constructor(uint32 _baseChainAssetPrecision) {
+    constructor(uint32 _baseChainAssetPrecision, string memory _baseChainBridgeAddress, string memory _baseChainAssetDenomination) {
         if (_baseChainAssetPrecision > 18) {
             revert("AstriaWithdrawer: base chain asset precision must be less than or equal to 18");
         }
         BASE_CHAIN_ASSET_PRECISION = _baseChainAssetPrecision;
+        BASE_CHAIN_BRIDGE_ADDRESS = _baseChainBridgeAddress;
+        BASE_CHAIN_ASSET_DENOMINATION = _baseChainAssetDenomination;
         DIVISOR = 10 ** (18 - _baseChainAssetPrecision);
     }
 
@@ -25,7 +27,7 @@ contract AstriaWithdrawer is IAstriaWithdrawer {
         _;
     }
     
-    function withdrawToSequencer(address destinationChainAddress) external payable sufficientValue(msg.value) {
+    function withdrawToSequencer(string calldata destinationChainAddress) external payable sufficientValue(msg.value) {
         emit SequencerWithdrawal(msg.sender, msg.value, destinationChainAddress);
     }
 

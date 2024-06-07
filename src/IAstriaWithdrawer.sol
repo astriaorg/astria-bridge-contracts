@@ -9,11 +9,17 @@ abstract contract IAstriaWithdrawer {
     // for example, if base chain asset is precision is 6, the divisor would be 10^12.
     uint32 public immutable BASE_CHAIN_ASSET_PRECISION;
 
+    // the address of the bridge on the base chain.
+    string public BASE_CHAIN_BRIDGE_ADDRESS;
+
+    // the denomination of the asset on the base chain.
+    string public BASE_CHAIN_ASSET_DENOMINATION;
+
     // emitted when a withdrawal to the sequencer is initiated
     //
     // the `sender` is the evm address that initiated the withdrawal
     // the `destinationChainAddress` is the address on the sequencer the funds will be sent to
-    event SequencerWithdrawal(address indexed sender, uint256 indexed amount, address destinationChainAddress);
+    event SequencerWithdrawal(address indexed sender, uint256 indexed amount, string destinationChainAddress);
 
     // emitted when a withdrawal to the IBC origin chain is initiated.
     // the withdrawal is sent to the origin chain via IBC from the sequencer using the denomination trace.
