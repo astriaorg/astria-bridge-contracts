@@ -36,3 +36,77 @@ Call `withdrawToOriginChain` in `AstriaWithdrawer.sol`:
 forge script script/AstriaWithdrawer.s.sol:AstriaWithdrawerScript \
    --rpc-url $RPC_URL --broadcast --sig "withdrawToOriginChain()" -vvvv
 ```
+
+## Updating Smoke Test
+
+If you change the contract you will need to update the configuration for the
+smoke test in the astria monorepo. To do this, you must update the genesis
+contract in `[monorepo-root]/dev/values/rollup/dev.yml`.
+
+Note requires the [astria-go cli](https://github.com/astriaorg/astria-cli-go/?tab=readme-ov-file#installation)
+installed.
+
+1. First comment out the old genesis contract in the `genesisAlloc` section.
+1. Deploy a new cluster:
+
+    ```sh
+    # If don't have a local cluster running
+    > just deploy cluster
+    > just deploy ingress-controller
+    
+    # Deploy astria components
+    > just deploy astria-local
+    
+    # Deploy rollup, and init with funds
+    > just deploy dev-rollup
+    > just init rollup-bridge
+    ```
+
+1. Deploy the withdrawer contract, copy the success contract address:
+
+    ```sh
+    > cp cluster.env.example .env && source .env
+    > forge script script/AstriaWithdrawer.s.sol:AstriaWithdrawerScript \
+        --rpc-url $RPC_URL \
+        --legacy \
+        --broadcast \
+        --sig "deploy()" -vvvv
+    ```
+
+1. Get the contract address deployed:
+
+    ```sh
+    > just evm-get-deployed-contract-code <deployed-contract-address>
+    <new-contract-code>
+    ```
+
+1. Update the `genesisAlloc` section in `[monorepo-root]/dev/values/rollup/dev.yml`
+with the new contract code.
+1. Delete the cluster components and restart:
+
+   ```sh
+   > just delete dev-rollup && just delete astria-local
+   > just deploy astria-local
+   > just deploy dev-rollup
+   > just init rollup-bridge
+   ```
+
+1. Submit a withdraw TX to the new contract:
+
+    ```sh
+    > forge script script/AstriaWithdrawer.s.sol:AstriaWithdrawerScript \
+        --rpc-url $RPC_URL \
+        --legacy \
+        --broadcast \
+        --sig "withdrawToSequencer()" -vvvv --legacy
+    ```
+
+1. Note the withdraw TX hash and get the raw tx code for it:
+
+    ```sh
+    > just evm-get-raw-transaction <withdraw-tx-hash>
+    <new-bridge-tx>
+    ```
+
+1. Update the `bridge_tx_bytes` and `bridge_tx_hash` fields in
+`[monorepo-root]/charts/deploy.just` with the new raw tx bytes and hash repectfully.
