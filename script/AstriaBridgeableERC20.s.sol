@@ -26,30 +26,36 @@ contract AstriaBridgeableERC20Script is Script {
     }
 
     function mint() public {
-        // the `EVM_BRIDGE_ADDRESS` the contract was deployed with
-        address evmBridgeAddress = address(0);
-        vm.prank(evmBridgeAddress);
+        // the private key to the `EVM_BRIDGE_ADDRESS` the contract was deployed with
+        uint256 evmBridgePrivateKey = vm.envUint("EVM_BRIDGE_ADDRESS_PRIVATE_KEY");
+        vm.startBroadcast(evmBridgePrivateKey);
 
-        address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
-        AstriaBridgeableERC20 astriaWithdrawer = AstriaBridgeableERC20(contractAddress);
-
+        AstriaBridgeableERC20 astriaBridgeableERC20 = AstriaBridgeableERC20(vm.envAddress("ASTRIA_BRIDGEABLE_ERC20_ADDRESS"));
         address to = vm.envAddress("MINT_TO");
         uint256 amount = vm.envUint("MINT_AMOUNT");
-        astriaWithdrawer.mint(to, amount);
+        astriaBridgeableERC20.mint(to, amount);
 
-        vm.stopPrank(); 
+        vm.stopBroadcast();
+
+        uint256 balance = astriaBridgeableERC20.balanceOf(to);
+        console.logUint(balance);
+    }
+
+    function getBalance() public view {
+        AstriaBridgeableERC20 astriaBridgeableERC20 = AstriaBridgeableERC20(vm.envAddress("ASTRIA_BRIDGEABLE_ERC20_ADDRESS"));
+        address account = vm.envAddress("MINT_TO");
+        uint256 balance = astriaBridgeableERC20.balanceOf(account);
+        console.logUint(balance);
     }
 
     function withdrawToSequencer() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
-        AstriaBridgeableERC20 astriaWithdrawer = AstriaBridgeableERC20(contractAddress);
-
+        AstriaBridgeableERC20 astriaBridgeableERC20 = AstriaBridgeableERC20(vm.envAddress("ASTRIA_BRIDGEABLE_ERC20_ADDRESS"));
         string memory destinationChainAddress = vm.envString("SEQUENCER_DESTINATION_CHAIN_ADDRESS");
         uint256 amount = vm.envUint("AMOUNT");
-        astriaWithdrawer.withdrawToSequencer(amount, destinationChainAddress);
+        astriaBridgeableERC20.withdrawToSequencer(amount, destinationChainAddress);
 
         vm.stopBroadcast();
     }
@@ -58,12 +64,10 @@ contract AstriaBridgeableERC20Script is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
-        AstriaBridgeableERC20 astriaWithdrawer = AstriaBridgeableERC20(contractAddress);
-
+        AstriaBridgeableERC20 astriaBridgeableERC20 = AstriaBridgeableERC20(vm.envAddress("ASTRIA_BRIDGEABLE_ERC20_ADDRESS"));
         string memory destinationChainAddress = vm.envString("ORIGIN_DESTINATION_CHAIN_ADDRESS");
         uint256 amount = vm.envUint("AMOUNT");
-        astriaWithdrawer.withdrawToIbcChain(amount, destinationChainAddress, "");
+        astriaBridgeableERC20.withdrawToIbcChain(amount, destinationChainAddress, "");
 
         vm.stopBroadcast();
     }

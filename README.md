@@ -54,6 +54,12 @@ forge script script/AstriaBridgeableERC20.s.sol:AstriaBridgeableERC20Script \
 --rpc-url $RPC_URL --broadcast --sig "mint()" -vvvv
 ```
 
+Get balance:
+```sh
+forge script script/AstriaBridgeableERC20.s.sol:AstriaBridgeableERC20Script \
+   --rpc-url $RPC_URL --sig "getBalance()" -vvvv
+```
+
 Call `withdrawToSequencer` in `AstriaBridgeableERC20.sol`:
 
 ```sh
