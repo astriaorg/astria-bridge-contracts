@@ -29,7 +29,8 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
         string memory _baseChainAssetDenomination,
         string memory _name,
         string memory _symbol,
-        uint256 _withdrawalFee,
+        uint256 _sequencerWithdrawalFee,
+        uint256 _ibcWithdrawalFee,
         address _feeRecipient
     ) ERC20(_name, _symbol) Ownable(msg.sender) {
         uint8 decimals = decimals();
@@ -42,13 +43,14 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
         BASE_CHAIN_ASSET_DENOMINATION = _baseChainAssetDenomination;
         DIVISOR = 10 ** (decimals - _baseChainAssetPrecision);
         BRIDGE = _bridge;
-        WITHDRAWAL_FEE = _withdrawalFee;
+        SEQUENCER_WITHDRAWAL_FEE = _sequencerWithdrawalFee;
+        IBC_WITHDRAWAL_FEE = _ibcWithdrawalFee;
         FEE_RECIPIENT = _feeRecipient;
     }
 
-    modifier sufficientValue(uint256 amount) {
+    modifier sufficientValue(uint256 amount, uint256 withdrawalFee) {
+        require(msg.value == withdrawalFee, "AstriaBridgeableERC20: insufficient withdrawal fee");
         require(amount / DIVISOR > 0, "AstriaBridgeableERC20: insufficient value, must be greater than 10 ** (TOKEN_DECIMALS - BASE_CHAIN_ASSET_PRECISION)");
-        require(msg.value >= WITHDRAWAL_FEE, "AstriaBridgeableERC20: insufficient withdrawal fee");
         _;
     }
 
@@ -62,7 +64,7 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
 
     function withdrawToSequencer(uint256 _amount, string calldata _destinationChainAddress)
         external payable
-        sufficientValue(_amount)
+        sufficientValue(_amount, SEQUENCER_WITHDRAWAL_FEE)
     {
         ACCUMULATED_FEES += msg.value;
         _burn(msg.sender, _amount);
@@ -71,7 +73,7 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
 
     function withdrawToIbcChain(uint256 _amount, string calldata _destinationChainAddress, string calldata _memo)
         external payable
-        sufficientValue(_amount)
+        sufficientValue(_amount, IBC_WITHDRAWAL_FEE)
     {
         ACCUMULATED_FEES += msg.value;
         _burn(msg.sender, _amount);

@@ -12,10 +12,18 @@ contract AstriaWithdrawerScript is Script {
         string memory baseChainBridgeAddress = vm.envString("BASE_CHAIN_BRIDGE_ADDRESS");
         string memory baseChainAssetDenomination = vm.envString("BASE_CHAIN_ASSET_DENOMINATION");
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        uint256 withdrawalFee = vm.envUint("WITHDRAWAL_FEE");
+        uint256 sequencerWithdrawalFee = vm.envUint("SEQUENCER_WITHDRAWAL_FEE");
+        uint256 ibcWithdrawalFee = vm.envUint("IBC_WITHDRAWAL_FEE");
         address feeRecipient = vm.envAddress("FEE_RECIPIENT");
         vm.startBroadcast(deployerPrivateKey);
-        new AstriaWithdrawer(baseChainAssetPrecision, baseChainBridgeAddress, baseChainAssetDenomination, withdrawalFee, feeRecipient);
+        new AstriaWithdrawer(
+            baseChainAssetPrecision,
+            baseChainBridgeAddress,
+            baseChainAssetDenomination,
+            sequencerWithdrawalFee,
+            ibcWithdrawalFee,
+            feeRecipient
+        );
         vm.stopBroadcast();
     }
 
@@ -30,7 +38,7 @@ contract AstriaWithdrawerScript is Script {
         uint256 amount = vm.envUint("AMOUNT");
 
         // Read the withdrawal fee from the contract
-        uint256 fee = astriaWithdrawer.WITHDRAWAL_FEE();
+        uint256 fee = astriaWithdrawer.SEQUENCER_WITHDRAWAL_FEE();
         astriaWithdrawer.withdrawToSequencer{value: amount + fee}(destinationChainAddress);
 
         vm.stopBroadcast();
@@ -47,7 +55,7 @@ contract AstriaWithdrawerScript is Script {
         uint256 amount = vm.envUint("AMOUNT");
 
         // Read the withdrawal fee from the contract
-        uint256 fee = astriaWithdrawer.WITHDRAWAL_FEE();
+        uint256 fee = astriaWithdrawer.IBC_WITHDRAWAL_FEE();
         astriaWithdrawer.withdrawToIbcChain{value: amount + fee}(destinationChainAddress, "");
 
         vm.stopBroadcast();

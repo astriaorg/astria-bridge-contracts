@@ -12,7 +12,8 @@ contract AstriaBridgeableERC20Script is Script {
         string memory baseChainAssetDenomination = vm.envString("BASE_CHAIN_ASSET_DENOMINATION");
         string memory tokenName = vm.envString("TOKEN_NAME");
         string memory tokenSymbol = vm.envString("TOKEN_SYMBOL");
-        uint256 withdrawalFee = vm.envUint("WITHDRAWAL_FEE");
+        uint256 sequencerWithdrawalFee = vm.envUint("SEQUENCER_WITHDRAWAL_FEE");
+        uint256 ibcWithdrawalFee = vm.envUint("IBC_WITHDRAWAL_FEE");
         address feeRecipient = vm.envAddress("FEE_RECIPIENT");
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
@@ -23,7 +24,8 @@ contract AstriaBridgeableERC20Script is Script {
             baseChainAssetDenomination,
             tokenName,
             tokenSymbol,
-            withdrawalFee,
+            sequencerWithdrawalFee,
+            ibcWithdrawalFee,
             feeRecipient
         );
         vm.stopBroadcast();
@@ -61,7 +63,7 @@ contract AstriaBridgeableERC20Script is Script {
         uint256 amount = vm.envUint("AMOUNT");
 
         // Read the withdrawal fee from the contract
-        uint256 fee = astriaBridgeableERC20.WITHDRAWAL_FEE();
+        uint256 fee = astriaBridgeableERC20.SEQUENCER_WITHDRAWAL_FEE();
         astriaBridgeableERC20.withdrawToSequencer{value: fee}(amount, destinationChainAddress);
 
         vm.stopBroadcast();
@@ -76,7 +78,7 @@ contract AstriaBridgeableERC20Script is Script {
         uint256 amount = vm.envUint("AMOUNT");
 
         // Read the withdrawal fee from the contract
-        uint256 fee = astriaBridgeableERC20.WITHDRAWAL_FEE();
+        uint256 fee = astriaBridgeableERC20.IBC_WITHDRAWAL_FEE();
         astriaBridgeableERC20.withdrawToIbcChain{value: fee}(amount, destinationChainAddress, "");
 
         vm.stopBroadcast();

@@ -17,8 +17,11 @@ abstract contract IAstriaWithdrawer is Ownable {
     // the denomination of the asset on the base chain.
     string public BASE_CHAIN_ASSET_DENOMINATION;
 
-    // The fee charged for each withdrawal transaction
-    uint256 public WITHDRAWAL_FEE;
+    // The fee charged for each sequencer withdrawal transaction
+    uint256 public SEQUENCER_WITHDRAWAL_FEE;
+
+    // The fee charged for each IBC withdrawal transaction
+    uint256 public IBC_WITHDRAWAL_FEE;
 
     // The address that receives the accumulated withdrawal fees
     address public FEE_RECIPIENT;
@@ -45,9 +48,14 @@ abstract contract IAstriaWithdrawer is Ownable {
         _;
     }
 
-    // Sets the withdrawal fee
-    function setWithdrawalFee(uint256 _newFee) external onlyOwner {
-        WITHDRAWAL_FEE = _newFee;
+    // Sets the sequencer withdrawal fee
+    function setSequencerWithdrawalFee(uint256 _newFee) external onlyOwner {
+        SEQUENCER_WITHDRAWAL_FEE = _newFee;
+    }
+
+    // Sets the IBC withdrawal fee
+    function setIbcWithdrawalFee(uint256 _newFee) external onlyOwner {
+        IBC_WITHDRAWAL_FEE = _newFee;
     }
 
     // Sets the fee recipient
