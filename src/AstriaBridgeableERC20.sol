@@ -3,6 +3,7 @@ pragma solidity ^0.8.21;
 
 import {IAstriaWithdrawer} from "./IAstriaWithdrawer.sol";
 import {ERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {Ownable} from "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
 contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
     // the `astriaBridgeSenderAddress` built into the astria-geth node
@@ -24,11 +25,14 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
     constructor(
         address _bridge,
         uint32 _baseChainAssetPrecision,
-        string memory _baseChainBridgeAddress, 
+        string memory _baseChainBridgeAddress,
         string memory _baseChainAssetDenomination,
         string memory _name,
-        string memory _symbol
-    ) ERC20(_name, _symbol) {
+        string memory _symbol,
+        uint256 _sequencerWithdrawalFee,
+        uint256 _ibcWithdrawalFee,
+        address _feeRecipient
+    ) ERC20(_name, _symbol) Ownable(msg.sender) {
         uint8 decimals = decimals();
         if (_baseChainAssetPrecision > decimals) {
             revert("AstriaBridgeableERC20: base chain asset precision must be less than or equal to token decimals");
@@ -39,9 +43,13 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
         BASE_CHAIN_ASSET_DENOMINATION = _baseChainAssetDenomination;
         DIVISOR = 10 ** (decimals - _baseChainAssetPrecision);
         BRIDGE = _bridge;
+        SEQUENCER_WITHDRAWAL_FEE = _sequencerWithdrawalFee;
+        IBC_WITHDRAWAL_FEE = _ibcWithdrawalFee;
+        FEE_RECIPIENT = _feeRecipient;
     }
 
-    modifier sufficientValue(uint256 amount) {
+    modifier sufficientValue(uint256 amount, uint256 withdrawalFee) {
+        require(msg.value == withdrawalFee, "AstriaBridgeableERC20: insufficient withdrawal fee");
         require(amount / DIVISOR > 0, "AstriaBridgeableERC20: insufficient value, must be greater than 10 ** (TOKEN_DECIMALS - BASE_CHAIN_ASSET_PRECISION)");
         _;
     }
@@ -55,17 +63,19 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
     }
 
     function withdrawToSequencer(uint256 _amount, string calldata _destinationChainAddress)
-        external
-        sufficientValue(_amount)
+        external payable
+        sufficientValue(_amount, SEQUENCER_WITHDRAWAL_FEE)
     {
+        ACCUMULATED_FEES += msg.value;
         _burn(msg.sender, _amount);
         emit SequencerWithdrawal(msg.sender, _amount, _destinationChainAddress);
     }
 
     function withdrawToIbcChain(uint256 _amount, string calldata _destinationChainAddress, string calldata _memo)
-        external
-        sufficientValue(_amount)
+        external payable
+        sufficientValue(_amount, IBC_WITHDRAWAL_FEE)
     {
+        ACCUMULATED_FEES += msg.value;
         _burn(msg.sender, _amount);
         emit Ics20Withdrawal(msg.sender, _amount, _destinationChainAddress, _memo);
     }

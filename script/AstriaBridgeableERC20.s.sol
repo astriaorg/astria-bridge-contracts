@@ -12,6 +12,9 @@ contract AstriaBridgeableERC20Script is Script {
         string memory baseChainAssetDenomination = vm.envString("BASE_CHAIN_ASSET_DENOMINATION");
         string memory tokenName = vm.envString("TOKEN_NAME");
         string memory tokenSymbol = vm.envString("TOKEN_SYMBOL");
+        uint256 sequencerWithdrawalFee = vm.envUint("SEQUENCER_WITHDRAWAL_FEE");
+        uint256 ibcWithdrawalFee = vm.envUint("IBC_WITHDRAWAL_FEE");
+        address feeRecipient = vm.envAddress("FEE_RECIPIENT");
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
         new AstriaBridgeableERC20(
@@ -20,7 +23,10 @@ contract AstriaBridgeableERC20Script is Script {
             baseChainBridgeAddress,
             baseChainAssetDenomination,
             tokenName,
-            tokenSymbol
+            tokenSymbol,
+            sequencerWithdrawalFee,
+            ibcWithdrawalFee,
+            feeRecipient
         );
         vm.stopBroadcast();
     }
@@ -55,7 +61,10 @@ contract AstriaBridgeableERC20Script is Script {
         AstriaBridgeableERC20 astriaBridgeableERC20 = AstriaBridgeableERC20(vm.envAddress("ASTRIA_BRIDGEABLE_ERC20_ADDRESS"));
         string memory destinationChainAddress = vm.envString("SEQUENCER_DESTINATION_CHAIN_ADDRESS");
         uint256 amount = vm.envUint("AMOUNT");
-        astriaBridgeableERC20.withdrawToSequencer(amount, destinationChainAddress);
+
+        // Read the withdrawal fee from the contract
+        uint256 fee = astriaBridgeableERC20.SEQUENCER_WITHDRAWAL_FEE();
+        astriaBridgeableERC20.withdrawToSequencer{value: fee}(amount, destinationChainAddress);
 
         vm.stopBroadcast();
     }
@@ -67,7 +76,10 @@ contract AstriaBridgeableERC20Script is Script {
         AstriaBridgeableERC20 astriaBridgeableERC20 = AstriaBridgeableERC20(vm.envAddress("ASTRIA_BRIDGEABLE_ERC20_ADDRESS"));
         string memory destinationChainAddress = vm.envString("ORIGIN_DESTINATION_CHAIN_ADDRESS");
         uint256 amount = vm.envUint("AMOUNT");
-        astriaBridgeableERC20.withdrawToIbcChain(amount, destinationChainAddress, "");
+
+        // Read the withdrawal fee from the contract
+        uint256 fee = astriaBridgeableERC20.IBC_WITHDRAWAL_FEE();
+        astriaBridgeableERC20.withdrawToIbcChain{value: fee}(amount, destinationChainAddress, "");
 
         vm.stopBroadcast();
     }
