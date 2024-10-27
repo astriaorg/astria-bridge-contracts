@@ -12,7 +12,7 @@ contract AstriaWithdrawerManager is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
-        AstriaWithdrawer astriaWithdrawer = AstriaWithdrawer(contractAddress);
+        IAstriaWithdrawer astriaWithdrawer = IAstriaWithdrawer(contractAddress);
 
         astriaWithdrawer.claimFees();
 
@@ -37,10 +37,36 @@ contract AstriaWithdrawerManager is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
-        AstriaWithdrawer astriaWithdrawer = AstriaWithdrawer(contractAddress);
+        IAstriaWithdrawer astriaWithdrawer = IAstriaWithdrawer(contractAddress);
 
         uint256 newFee = vm.envUint("IBC_WITHDRAWAL_FEE");
         astriaWithdrawer.setIbcWithdrawalFee(newFee);
+
+        vm.stopBroadcast();
+    }
+
+    function setFeeRecipient() public {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
+        IAstriaWithdrawer astriaWithdrawer = IAstriaWithdrawer(contractAddress);
+
+        address newFeeRecipient = vm.envAddress("FEE_RECIPIENT");
+        astriaWithdrawer.setFeeRecipient(newFeeRecipient);
+
+        vm.stopBroadcast();
+    }
+
+    function transferOwnership() public {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
+        IAstriaWithdrawer astriaWithdrawer = IAstriaWithdrawer(contractAddress);
+
+        address newContractOwner = vm.envAddress("CONTRACT_NEW_OWNER");
+        astriaWithdrawer.transferOwnership(newContractOwner);
 
         vm.stopBroadcast();
     }
