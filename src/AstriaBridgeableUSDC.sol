@@ -30,7 +30,7 @@ contract AstriaBridgeableUSDC is IAstriaWithdrawer, ERC20 {
         uint256 _sequencerWithdrawalFee,
         uint256 _ibcWithdrawalFee,
         address _feeRecipient
-    ) ERC20("USDC", "USDC") Ownable(msg.sender) {
+    ) ERC20("USD Coin", "USDC") Ownable(msg.sender) {
         if (_baseChainAssetPrecision > decimals()) {
             revert("AstriaBridgeableUSDC: base chain asset precision must be less than or equal to token decimals");
         }
