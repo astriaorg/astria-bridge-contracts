@@ -14,6 +14,8 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
     // set to 10 ** (TOKEN_DECIMALS - BASE_CHAIN_ASSET_PRECISION) on contract creation
     uint256 private immutable DIVISOR;
 
+    uint8 private immutable DECIMALS;
+
     // emitted when tokens are minted from a deposit
     event Mint(address indexed account, uint256 amount);
 
@@ -31,17 +33,22 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
         string memory _symbol,
         uint256 _sequencerWithdrawalFee,
         uint256 _ibcWithdrawalFee,
-        address _feeRecipient
+        address _feeRecipient,
+        uint8 _decimals
     ) ERC20(_name, _symbol) Ownable(msg.sender) {
-        uint8 decimals = decimals();
-        if (_baseChainAssetPrecision > decimals) {
+        uint8 decimalsToSet = _decimals;
+        if (decimalsToSet == 0) {
+            decimalsToSet = 18;
+        }
+        DECIMALS = decimalsToSet;
+        if (_baseChainAssetPrecision > decimals()) {
             revert("AstriaBridgeableERC20: base chain asset precision must be less than or equal to token decimals");
         }
 
         BASE_CHAIN_ASSET_PRECISION = _baseChainAssetPrecision;
         BASE_CHAIN_BRIDGE_ADDRESS = _baseChainBridgeAddress;
         BASE_CHAIN_ASSET_DENOMINATION = _baseChainAssetDenomination;
-        DIVISOR = 10 ** (decimals - _baseChainAssetPrecision);
+        DIVISOR = 10 ** (decimals() - _baseChainAssetPrecision);
         BRIDGE = _bridge;
         SEQUENCER_WITHDRAWAL_FEE = _sequencerWithdrawalFee;
         IBC_WITHDRAWAL_FEE = _ibcWithdrawalFee;
@@ -52,6 +59,10 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
         require(msg.value == withdrawalFee, "AstriaBridgeableERC20: insufficient withdrawal fee");
         require(amount / DIVISOR > 0, "AstriaBridgeableERC20: insufficient value, must be greater than 10 ** (TOKEN_DECIMALS - BASE_CHAIN_ASSET_PRECISION)");
         _;
+    }
+
+    function decimals() public view override returns (uint8) {
+        return DECIMALS;
     }
 
     function mint(address _to, uint256 _amount)
