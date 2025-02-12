@@ -32,11 +32,11 @@ forge script script/AstriaWithdrawer.s.sol:AstriaWithdrawerScript \
    --rpc-url $RPC_URL --broadcast --sig "withdrawToSequencer()" -vvvv
 ```
 
-Call `withdrawToOriginChain` in `AstriaWithdrawer.sol`:
+Call `withdrawToIbcChain` in `AstriaWithdrawer.sol`:
 
 ```sh
 forge script script/AstriaWithdrawer.s.sol:AstriaWithdrawerScript \
-   --rpc-url $RPC_URL --broadcast --sig "withdrawToOriginChain()" -vvvv
+   --rpc-url $RPC_URL --broadcast --sig "withdrawToIbcChain()" -vvvv
 ```
 
 ### `AstriaBridgeableERC20.sol`
