@@ -26,7 +26,8 @@ contract AstriaBridgeableERC20Script is Script {
             tokenSymbol,
             sequencerWithdrawalFee,
             ibcWithdrawalFee,
-            feeRecipient
+            feeRecipient,
+            18
         );
         vm.stopBroadcast();
     }

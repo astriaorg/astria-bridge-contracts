@@ -55,3 +55,4 @@ contract AstriaWithdrawer is IAstriaWithdrawer {
         emit Ics20Withdrawal(msg.sender, msg.value - IBC_WITHDRAWAL_FEE, destinationChainAddress, memo);
     }
 }
+
