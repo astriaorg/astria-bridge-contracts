@@ -43,6 +43,13 @@ abstract contract IAstriaWithdrawer is Ownable {
     // the `memo` is an optional field that will be used as the ICS20 packet memo
     event Ics20Withdrawal(address indexed sender, uint256 indexed amount, string destinationChainAddress, string memo);
 
+    // emitted when a withdrawal to a rollup on astria is initiated.
+    //
+    // the `sender` is the evm address that initiated the withdrawal
+    // the `destinationChainAddress` is the address on the recipient rollup the funds will be sent to
+    // the `memo` is an optional field that will be used as the ICS20 packet memo
+    event RollupWithdrawal(address indexed sender, uint256 indexed amount, string destinationChainAddress, string destinationRollupBridgeAddress);
+
     modifier onlyFeeRecipient() {
         require(msg.sender == FEE_RECIPIENT, "AstriaBridgeableERC20: only fee recipient");
         _;

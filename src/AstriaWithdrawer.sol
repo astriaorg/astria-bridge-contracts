@@ -54,4 +54,12 @@ contract AstriaWithdrawer is IAstriaWithdrawer {
         ACCUMULATED_FEES += IBC_WITHDRAWAL_FEE;
         emit Ics20Withdrawal(msg.sender, msg.value - IBC_WITHDRAWAL_FEE, destinationChainAddress, memo);
     }
+
+    function withdrawToRollup(string calldata destinationChainAddress, string calldata destinationRollupBridgeAddress)
+        external payable
+        sufficientValue(msg.value, SEQUENCER_WITHDRAWAL_FEE)
+    {
+        ACCUMULATED_FEES += SEQUENCER_WITHDRAWAL_FEE;
+        emit RollupWithdrawal(msg.sender, msg.value - SEQUENCER_WITHDRAWAL_FEE, destinationChainAddress, destinationRollupBridgeAddress);
+    }
 }

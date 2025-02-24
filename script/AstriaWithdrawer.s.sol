@@ -60,4 +60,24 @@ contract AstriaWithdrawerScript is Script {
 
         vm.stopBroadcast();
     }
+
+    function withdrawToRollup() public {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        address contractAddress = vm.envAddress("ASTRIA_WITHDRAWER");
+        AstriaWithdrawer astriaWithdrawer = AstriaWithdrawer(contractAddress);
+
+        string memory destinationChainAddress = vm.envString("ROLLUP_DESTINATION_CHAIN_ADDRESS");
+        string memory destinationRollupBridgeAddress = vm.envString("ROLLUP_DESTINATION_BRIDGE_ADDRESS");
+        
+        uint256 amount = vm.envUint("AMOUNT");
+
+        // Read the withdrawal fee from the contract
+        uint256 fee = astriaWithdrawer.SEQUENCER_WITHDRAWAL_FEE();
+        astriaWithdrawer.withdrawToRollup{value: amount + fee}(destinationChainAddress, destinationRollupBridgeAddress);
+
+        vm.stopBroadcast();
+
+    }
 }
