@@ -47,7 +47,7 @@ abstract contract IAstriaWithdrawer is Ownable {
     //
     // the `sender` is the evm address that initiated the withdrawal
     // the `destinationChainAddress` is the address on the recipient rollup the funds will be sent to
-    // the `memo` is an optional field that will be used as the ICS20 packet memo
+    // the `destinationRollupBridgeAddress` is the bridge address of the recipient rollup the funds will be sent to
     event RollupWithdrawal(address indexed sender, uint256 indexed amount, string destinationChainAddress, string destinationRollupBridgeAddress);
 
     modifier onlyFeeRecipient() {

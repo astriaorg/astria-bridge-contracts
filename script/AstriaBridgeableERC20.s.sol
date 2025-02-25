@@ -83,4 +83,23 @@ contract AstriaBridgeableERC20Script is Script {
 
         vm.stopBroadcast();
     }
+
+    function withdrawToRollup() public {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        AstriaBridgeableERC20 astriaBridgeableERC20 = AstriaBridgeableERC20(vm.envAddress("ASTRIA_BRIDGEABLE_ERC20_ADDRESS"));
+
+        string memory destinationChainAddress = vm.envString("ROLLUP_DESTINATION_CHAIN_ADDRESS");
+        string memory destinationRollupBridgeAddress = vm.envString("ROLLUP_DESTINATION_BRIDGE_ADDRESS");
+        
+        uint256 amount = vm.envUint("AMOUNT");
+
+        // Read the withdrawal fee from the contract
+        uint256 fee = astriaBridgeableERC20.SEQUENCER_WITHDRAWAL_FEE();
+        astriaBridgeableERC20.withdrawToRollup{value: fee}(amount, destinationChainAddress, destinationRollupBridgeAddress);
+
+        vm.stopBroadcast();
+
+    }
 }

@@ -39,6 +39,13 @@ forge script script/AstriaWithdrawer.s.sol:AstriaWithdrawerScript \
    --rpc-url $RPC_URL --broadcast --sig "withdrawToIbcChain()" -vvvv
 ```
 
+Call `withdrawToRollup` in `AstriaWithdrawer.sol`:
+
+```sh
+forge script script/AstriaWithdrawer.s.sol:AstriaWithdrawerScript \
+   --rpc-url $RPC_URL --broadcast --sig "withdrawToRollup()" -vvvv
+```
+
 ### `AstriaBridgeableERC20.sol`
 
 Deploy `AstriaBridgeableERC20.sol`:
@@ -72,4 +79,11 @@ Call `withdrawToOriginChain` in `AstriaBridgeableERC20.sol`:
 ```sh
 forge script script/AstriaBridgeableERC20.s.sol:AstriaBridgeableERC20Script \
    --rpc-url $RPC_URL --broadcast --sig "withdrawToOriginChain()" -vvvv
+```
+
+Call `withdrawToRollup` in `AstriaBridgeableERC20.sol`:
+
+```sh
+forge script script/AstriaBridgeableERC20.s.sol:AstriaBridgeableERC20Script \
+   --rpc-url $RPC_URL --broadcast --sig "withdrawToRollup()" -vvvv
 ```

@@ -79,4 +79,13 @@ contract AstriaBridgeableERC20 is IAstriaWithdrawer, ERC20 {
         _burn(msg.sender, _amount);
         emit Ics20Withdrawal(msg.sender, _amount, _destinationChainAddress, _memo);
     }
+
+    function withdrawToRollup(uint256 _amount, string calldata _destinationChainAddress, string calldata _destinationRollupBridgeAddress)
+        external payable
+        sufficientValue(msg.value, SEQUENCER_WITHDRAWAL_FEE)
+    {
+        ACCUMULATED_FEES += msg.value;
+        _burn(msg.sender, _amount);
+        emit RollupWithdrawal(msg.sender, _amount, _destinationChainAddress, _destinationRollupBridgeAddress);
+    }
 }
